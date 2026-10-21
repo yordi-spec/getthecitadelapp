@@ -124,6 +124,28 @@
   var trackedLink = LINKRUNNER[account];
   if (trackedLink) first.href = trackedLink;
 
+  // Visit counter (PostHog event "bio_page_viewed", one per visit, per account).
+  // Yordi's own devices: open the page once with ?me and that browser is never counted again
+  // (?me=off counts it again). Storage can be blocked; then the visit is simply counted.
+  var store = function (k, v) { try { if (v === undefined) return localStorage.getItem(k); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} };
+  var q = location.search;
+  if (/[?&]me=off\b/.test(q)) store("citadel_me", null); else if (/[?&]me\b/.test(q)) store("citadel_me", "1");
+  if (store("citadel_me") !== "1") {
+    var vid = store("citadel_vid");
+    if (!vid) { vid = "bio-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 10); store("citadel_vid", vid); }
+    var body = JSON.stringify({
+      api_key: "phc_kP3oeEsgzETRjbPtSxYr7BzCzi8mauzib9vKRh7UE2Td",
+      event: "bio_page_viewed",
+      distinct_id: vid,
+      properties: { account: account || "none", os: isIOS ? "iOS" : isAndroid ? "Android" : "other", $current_url: location.href, $process_person_profile: false }
+    });
+    var url = "https://eu.i.posthog.com/capture/";
+    // sendBeacon survives the jump to the store that follows in a real browser.
+    if (!(navigator.sendBeacon && navigator.sendBeacon(url, new Blob([body], { type: "text/plain" })))) {
+      try { fetch(url, { method: "POST", body: body, keepalive: true }); } catch (e) {}
+    }
+  }
+
   // In a real browser (Safari, Chrome; e.g. after TikTok's "Open in browser"), go straight to the right store.
   // Inside an app's built-in browser (TikTok, Instagram) that jump is blocked, so the page stays.
   var appMarkers = /musical_ly|Bytedance|trill|TikTok|Instagram|FBAN|FBAV|FB_IAB|Snapchat|LinkedInApp/i.test(ua);
