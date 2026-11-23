@@ -141,9 +141,11 @@
     thoughts: "https://citadelapp.greatstoic.com/?c=tiktok-thoughts",
     // Instagram bios (Yordi, 2026-11-23): here the store buttons are meant to work, so no TikTok steps.
     innercitadel: "https://citadelapp.greatstoic.com/?c=instagram-innercitadel",
-    thegreatstoic1: "https://citadelapp.greatstoic.com/?c=instagram-thegreatstoic1"
+    thegreatstoic1: "https://citadelapp.greatstoic.com/?c=instagram-thegreatstoic1",
+    // Pinterest @thegreatstoic: same as Instagram, the buttons are meant to work.
+    pinterest: "https://citadelapp.greatstoic.com/?c=pinterest-thegreatstoic"
   };
-  var INSTAGRAM = { innercitadel: 1, thegreatstoic1: 1 };
+  var INSTAGRAM = { innercitadel: 1, thegreatstoic1: 1, pinterest: 1 };
   var account = location.pathname.split("/").join("").toLowerCase();
   var trackedLink = LINKRUNNER[account];
   var fromInstagram = !!INSTAGRAM[account];
@@ -174,7 +176,7 @@
 
   // In a real browser (Safari, Chrome; e.g. after TikTok's "Open in browser"), go straight to the right store.
   // Inside an app's built-in browser (TikTok, Instagram) that jump is blocked, so the page stays.
-  var appMarkers = /musical_ly|Bytedance|trill|TikTok|Instagram|FBAN|FBAV|FB_IAB|Snapchat|LinkedInApp/i.test(ua);
+  var appMarkers = /musical_ly|Bytedance|trill|TikTok|Instagram|FBAN|FBAV|FB_IAB|Pinterest|Snapchat|LinkedInApp/i.test(ua);
   var inApp = appMarkers
     || (isIOS && ua.indexOf("Safari/") === -1)
     || (isAndroid && ua.indexOf("; wv)") !== -1);
